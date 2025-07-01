@@ -2,119 +2,118 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
+  <title>卒業ストーリーRPG風</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>卒業ストーリー🌸</title>
   <style>
     body {
-      font-family: 'Hiragino Sans', sans-serif;
-      background-color: #FFF8F1;
+      background-color: #f9f5ec;
+      font-family: "MS Gothic", monospace;
       margin: 0;
-      padding: 20px;
-      color: #4A4A4A;
-      text-align: center;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
-    h1 {
-      color: #FFC8DD;
-    }
-    .story-card {
+    #game {
       background-color: #ffffff;
-      border-radius: 16px;
-      padding: 16px;
-      margin: 20px auto;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+      border: 4px solid #444;
+      border-radius: 10px;
+      padding: 20px;
+      width: 90%;
       max-width: 600px;
-      opacity: 0;
-      transition: opacity 0.5s ease-in-out;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
     }
-    .story-card.active {
-      opacity: 1;
+    #dialogue {
+      min-height: 120px;
+      white-space: pre-wrap;
+      margin-bottom: 20px;
+      line-height: 1.5;
     }
-    .story-card img {
-      width: 100%;
-      border-radius: 12px;
+    .choice {
+      margin-top: 10px;
     }
-    .story-card h2 {
-      margin: 12px 0 4px;
-      color: #B983FF;
-    }
-    .story-card .date {
-      font-size: 0.85em;
-      color: #888;
-    }
-    .footer {
-      margin-top: 40px;
-    }
-    .footer button {
-      background-color: #FFC8DD;
+    button {
+      font-family: "MS Gothic", monospace;
+      background-color: #c8b6ff;
       border: none;
-      padding: 12px 24px;
-      font-size: 1em;
-      border-radius: 24px;
-      color: white;
+      padding: 10px 20px;
+      margin: 5px;
+      border-radius: 8px;
       cursor: pointer;
     }
-    .footer button:hover {
-      background-color: #FFAFCC;
+    button:hover {
+      background-color: #b8a0ff;
+    }
+    #nameInput {
+      width: 80%;
+      padding: 8px;
+      font-size: 1em;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
-  <h1>卒業ストーリー🌸</h1>
-
-  <div id="story-container"></div>
-
-  <div class="footer">
-    <button onclick="nextStory()">▶ 次へ</button>
+  <div id="game">
+    <div id="dialogue">
+      ようこそ。あなたの名前を入力してください。
+    </div>
+    <div id="inputArea">
+      <input type="text" id="nameInput" placeholder="名前を入力">
+      <br>
+      <button onclick="startGame()">スタート</button>
+    </div>
+    <div id="choices" style="display: none;"></div>
   </div>
 
   <script>
-    const stories = [
-      {
-        name: "山田花子さん",
-        date: "2025年3月15日",
-        message: "3年間ありがとう！たくさんの笑顔と涙を忘れません。",
-        img: "https://source.unsplash.com/featured/?graduation,1"
-      },
-      {
-        name: "佐藤太郎くん",
-        date: "2025年3月18日",
-        message: "仲間と笑い合った日々が宝物です。ありがとう！",
-        img: "https://source.unsplash.com/featured/?school,2"
-      },
-      {
-        name: "高橋さくらさん",
-        date: "2025年3月20日",
-        message: "一生の思い出をくれたみんなに感謝🌸",
-        img: "https://source.unsplash.com/featured/?friends,3"
+    let playerName = '';
+    const dialogue = document.getElementById('dialogue');
+    const inputArea = document.getElementById('inputArea');
+    const choices = document.getElementById('choices');
+
+    function startGame() {
+      const input = document.getElementById('nameInput').value.trim();
+      if (!input) {
+        alert("名前を入力してください");
+        return;
       }
-    ];
+      playerName = input;
+      inputArea.style.display = "none";
+      showIntro();
+    }
 
-    let current = 0;
+    function showIntro() {
+      dialogue.innerText =
+        `${playerName}は卒業式を終えた教室に一人立っている。\n` +
+        `夕陽が差し込み、思い出が胸をよぎる。\n\n` +
+        `今日、最後に手紙を渡す相手を決めなければならない...。`;
 
-    function showStory(index) {
-      const container = document.getElementById('story-container');
-      container.innerHTML = ''; // 前の内容を消す
-
-      const card = document.createElement('div');
-      card.className = 'story-card active';
-
-      card.innerHTML = `
-        <img src="${stories[index].img}" alt="卒業写真">
-        <h2>${stories[index].name}</h2>
-        <p class="date">卒業日：${stories[index].date}</p>
-        <p>${stories[index].message}</p>
+      choices.innerHTML = `
+        <button onclick="choose('リン')">親友のリンに渡す</button>
+        <button onclick="choose('ミナト先生')">ミナト先生に渡す</button>
       `;
-
-      container.appendChild(card);
+      choices.style.display = "block";
     }
 
-    function nextStory() {
-      current = (current + 1) % stories.length;
-      showStory(current);
+    function choose(person) {
+      choices.style.display = "none";
+      if (person === 'リン') {
+        dialogue.innerText =
+          `${playerName}はリンのもとへ向かった。\n\n` +
+          `「リン、これ...手紙。3年間ありがとう」\n` +
+          `リンは驚いた顔をして、すぐに笑顔になった。\n\n` +
+          `「こっちこそ！最高の親友だよ！」\n\n` +
+          `涙があふれる卒業の夕暮れだった。`;
+      } else {
+        dialogue.innerText =
+          `${playerName}は職員室へと足を運ぶ。\n\n` +
+          `「先生、これ...受け取ってください」\n` +
+          `ミナト先生は少し目を見開き、手紙を大事そうに受け取った。\n\n` +
+          `「君の未来が光にあふれますように」\n\n` +
+          `静かな祝福に包まれた別れの時だった。`;
+      }
     }
-
-    // 初回表示
-    showStory(current);
   </script>
 </body>
 </html>
