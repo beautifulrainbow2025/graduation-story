@@ -2,152 +2,99 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>卒業ストーリーRPG</title>
   <style>
     body {
+      font-family: 'Helvetica Neue', sans-serif;
+      background-color: #fef6f0;
+      color: #333;
       margin: 0;
-      font-family: "Hiragino Kaku Gothic ProN", sans-serif;
-      background: linear-gradient(to bottom right, #fef9f4, #cceeff);
+      padding: 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
     }
-
     .window {
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      background: #fff;
+      border: 3px solid #ccc;
+      border-radius: 20px;
       padding: 20px;
-      max-width: 600px;
+      max-width: 500px;
       width: 100%;
-      animation: fadeIn 1s ease;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.1);
     }
-
-    h1 {
-      text-align: center;
-      font-size: 1.8rem;
-    }
-
-    input, button {
+    .character-img {
       width: 100%;
-      margin-top: 10px;
-      padding: 12px;
-      font-size: 1rem;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+      border-radius: 12px;
+      margin-bottom: 15px;
     }
-
-    button.choice {
-      margin-top: 15px;
-      background: #a7d7c5;
+    button {
+      padding: 10px 20px;
+      margin: 10px 5px;
+      background: #ffa07a;
       border: none;
+      border-radius: 12px;
+      color: white;
+      font-weight: bold;
       cursor: pointer;
-      transition: background 0.3s;
     }
-
-    button.choice:hover {
-      background: #88c2ad;
-    }
-
-    #story, #ending {
-      white-space: pre-line;
-      margin-top: 20px;
-      animation: fadeIn 0.8s ease;
-    }
-
-    .char-img {
-      width: 100px;
-      border-radius: 10px;
-      margin-top: 10px;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    button:hover {
+      background: #f08080;
     }
   </style>
 </head>
 <body>
-  <div class="window">
-    <h1>卒業ストーリー</h1>
-    <div id="inputArea">
-      <p>あなたの名前を入力してください：</p>
-      <input type="text" id="nameInput" placeholder="名前" />
-      <button onclick="startStory()">スタート</button>
-    </div>
-    <div id="storyArea" style="display: none;">
-      <div id="story"></div>
-      <div id="choices"></div>
-    </div>
-    <div id="endingArea" style="display: none;">
-      <img id="charImage" class="char-img" src="" alt="" />
-      <div id="ending"></div>
-    </div>
-  </div>
-
   <audio id="bgm" loop>
     <source src="https://cdn.pixabay.com/audio/2023/04/19/audio_812dde726d.mp3" type="audio/mpeg" />
   </audio>
 
-  <script>
-    const bgm = document.getElementById("bgm");
+  <div class="window" id="game">
+    <h1>卒業ストーリー</h1>
+    <p>あなたの名前を入力してください：</p>
+    <input type="text" id="playerName" placeholder="例：さくら">
+    <button onclick="startStory()">はじめる</button>
+  </div>
 
+  <script>
+    const gameDiv = document.getElementById("game");
     const characters = {
       "マリー": {
-        img: "https://cdn.pixabay.com/photo/2023/05/19/06/52/girl-8002005_1280.png",
-        ending: "マリーは泣きながら笑って言った。\n\n『これからもずっと友達だよ！ありがとう♡』"
+        img: "https://cdn.pixabay.com/photo/2017/01/31/19/16/girl-2027622_960_720.png",
+        ending: "マリーは泣きながら手紙を読んでくれました。"
       },
       "ジェイソン": {
-        img: "https://cdn.pixabay.com/photo/2021/01/06/13/54/boy-5893830_1280.png",
-        ending: "ジェイソンは静かに手紙を受け取り、\n\n『...君がいたから、この1年は完璧だった。』"
+        img: "https://cdn.pixabay.com/photo/2021/08/04/18/03/boy-6521035_960_720.png",
+        ending: "ジェイソンは静かに微笑み、握手を求めてきました。"
       },
       "マイク": {
-        img: "https://cdn.pixabay.com/photo/2022/04/04/11/36/boy-7109574_1280.png",
-        ending: "マイクは顔を赤くしながら言った。\n\n『…こんな僕に、手紙をくれるなんて…宝物にするよ。』"
+        img: "https://cdn.pixabay.com/photo/2017/02/13/09/01/child-2065597_960_720.png",
+        ending: "マイクは顔を赤らめながらも、手紙を大切に受け取りました。"
       },
       "ナンシー": {
-        img: "https://cdn.pixabay.com/photo/2023/03/01/17/52/woman-7823176_1280.png",
-        ending: "ナンシーは微笑んで言った。\n\n『あなたの未来、楽しみにしてるね。がんばって！』"
+        img: "https://cdn.pixabay.com/photo/2020/12/16/10/36/girl-5835736_960_720.png",
+        ending: "ナンシーはしっかりとあなたを抱きしめてくれました。"
       }
     };
 
     function startStory() {
-      const name = document.getElementById("nameInput").value.trim();
-      if (!name) return alert("名前を入力してください");
-const bgm = document.getElementById("bgm");
-bgm.play().catch(err => console.log("BGM error:", err));
-
-      document.getElementById("inputArea").style.display = "none";
-      document.getElementById("storyArea").style.display = "block";
-
-      document.getElementById("story").textContent =
-        `${name}の卒業式が終わった。\n\n誰に手紙を渡そう？`;
-
-      const choices = document.getElementById("choices");
-      choices.innerHTML = "";
-
-      for (let char in characters) {
-        const btn = document.createElement("button");
-        btn.textContent = char + " に渡す";
-        btn.className = "choice";
-        btn.onclick = () => showEnding(char);
-        choices.appendChild(btn);
-      }
-
-      bgm.play().catch(err => console.log("BGM error:", err));
+      const name = document.getElementById("playerName").value;
+      if (!name) return alert("名前を入力してください。");
+      const bgm = document.getElementById("bgm");
+      bgm.play().catch(e => console.log("BGM Error:", e));
+      gameDiv.innerHTML = `<h2>${name}の卒業式</h2>
+        <p>卒業式が終わったあと…最後に手紙を渡したいのは？</p>
+        ${Object.keys(characters).map(c => `<button onclick="choose('${c}', '${name}')">${c}</button>`).join('')}`;
     }
 
-    function showEnding(charName) {
-      document.getElementById("storyArea").style.display = "none";
-      document.getElementById("endingArea").style.display = "block";
-
-      document.getElementById("charImage").src = characters[charName].img;
-      document.getElementById("charImage").alt = charName;
-      document.getElementById("ending").textContent = characters[charName].ending;
+    function choose(charName, playerName) {
+      const char = characters[charName];
+      gameDiv.innerHTML = `
+        <img class="character-img" src="${char.img}" alt="${charName}" />
+        <h2>${charName}と${playerName}</h2>
+        <p>${char.ending}</p>
+        <button onclick="location.reload()">もう一度</button>
+      `;
     }
   </script>
 </body>
