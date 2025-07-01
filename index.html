@@ -118,6 +118,8 @@
     function startStory() {
       const name = document.getElementById("nameInput").value.trim();
       if (!name) return alert("名前を入力してください");
+const bgm = document.getElementById("bgm");
+bgm.play().catch(err => console.log("BGM error:", err));
 
       document.getElementById("inputArea").style.display = "none";
       document.getElementById("storyArea").style.display = "block";
