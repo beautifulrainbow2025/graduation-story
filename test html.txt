@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>BGMテスト</title>
+</head>
+<body>
+  <h1>音が鳴るかテスト</h1>
+  <button onclick="playMusic()">再生</button>
+
+  <audio id="bgm" loop>
+    <source src="https://cdn.pixabay.com/audio/2023/04/19/audio_812dde726d.mp3" type="audio/mpeg" />
+  </audio>
+
+  <script>
+    function playMusic() {
+      const bgm = document.getElementById("bgm");
+      bgm.play().then(() => {
+        alert("再生開始！");
+      }).catch(error => {
+        alert("再生エラー：" + error.message);
+        console.error("再生失敗", error);
+      });
+    }
+  </script>
+</body>
+</html>
