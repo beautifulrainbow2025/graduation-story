@@ -7,25 +7,24 @@
   <style>
     body {
       margin: 0;
-      font-family: "MS PGothic", sans-serif;
-      background: linear-gradient(#ffe, #cdf);
+      font-family: "Hiragino Kaku Gothic ProN", sans-serif;
+      background: linear-gradient(to bottom right, #fef9f4, #cceeff);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
-      overflow: hidden;
+      min-height: 100vh;
+      padding: 20px;
     }
 
     .window {
       background: white;
-      border: 2px solid black;
-      border-radius: 10px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
       padding: 20px;
-      width: 90%;
-      max-width: 500px;
-      box-shadow: 4px 4px 0 black;
-      animation: fadeIn 1s ease-out;
+      max-width: 600px;
+      width: 100%;
+      animation: fadeIn 1s ease;
     }
 
     h1 {
@@ -36,19 +35,38 @@
     input, button {
       width: 100%;
       margin-top: 10px;
-      padding: 10px;
+      padding: 12px;
       font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
     }
 
-    #story {
-      margin-top: 20px;
+    button.choice {
+      margin-top: 15px;
+      background: #a7d7c5;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button.choice:hover {
+      background: #88c2ad;
+    }
+
+    #story, #ending {
       white-space: pre-line;
-      line-height: 1.5;
-      animation: fadeIn 1s ease-out;
+      margin-top: 20px;
+      animation: fadeIn 0.8s ease;
+    }
+
+    .char-img {
+      width: 100px;
+      border-radius: 10px;
+      margin-top: 10px;
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
+      from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
   </style>
@@ -57,12 +75,17 @@
   <div class="window">
     <h1>卒業ストーリー</h1>
     <div id="inputArea">
-      <p>名前を入力してください：</p>
-      <input type="text" id="nameInput" placeholder="あなたの名前" />
+      <p>あなたの名前を入力してください：</p>
+      <input type="text" id="nameInput" placeholder="名前" />
       <button onclick="startStory()">スタート</button>
     </div>
     <div id="storyArea" style="display: none;">
       <div id="story"></div>
+      <div id="choices"></div>
+    </div>
+    <div id="endingArea" style="display: none;">
+      <img id="charImage" class="char-img" src="" alt="" />
+      <div id="ending"></div>
     </div>
   </div>
 
@@ -73,24 +96,56 @@
   <script>
     const bgm = document.getElementById("bgm");
 
+    const characters = {
+      "マリー": {
+        img: "https://cdn.pixabay.com/photo/2023/05/19/06/52/girl-8002005_1280.png",
+        ending: "マリーは泣きながら笑って言った。\n\n『これからもずっと友達だよ！ありがとう♡』"
+      },
+      "ジェイソン": {
+        img: "https://cdn.pixabay.com/photo/2021/01/06/13/54/boy-5893830_1280.png",
+        ending: "ジェイソンは静かに手紙を受け取り、\n\n『...君がいたから、この1年は完璧だった。』"
+      },
+      "マイク": {
+        img: "https://cdn.pixabay.com/photo/2022/04/04/11/36/boy-7109574_1280.png",
+        ending: "マイクは顔を赤くしながら言った。\n\n『…こんな僕に、手紙をくれるなんて…宝物にするよ。』"
+      },
+      "ナンシー": {
+        img: "https://cdn.pixabay.com/photo/2023/03/01/17/52/woman-7823176_1280.png",
+        ending: "ナンシーは微笑んで言った。\n\n『あなたの未来、楽しみにしてるね。がんばって！』"
+      }
+    };
+
     function startStory() {
       const name = document.getElementById("nameInput").value.trim();
-      if (!name) {
-        alert("名前を入力してください！");
-        return;
-      }
+      if (!name) return alert("名前を入力してください");
 
       document.getElementById("inputArea").style.display = "none";
       document.getElementById("storyArea").style.display = "block";
 
-      const story = `${name}は今日、卒業の日を迎えた。\n\n校舎の廊下には、たくさんの思い出が詰まっている。\n\n誰に最後の手紙を渡そうか…？\n\n１．親友に渡す\n２．ずっと好きだったあの人に渡す`;
+      document.getElementById("story").textContent =
+        `${name}の卒業式が終わった。\n\n誰に手紙を渡そう？`;
 
-      document.getElementById("story").textContent = story;
+      const choices = document.getElementById("choices");
+      choices.innerHTML = "";
 
-      // ユーザー操作後に再生：自動再生ブロック対策済み
-      bgm.play().catch(err => {
-        console.log("BGM再生できませんでした:", err);
-      });
+      for (let char in characters) {
+        const btn = document.createElement("button");
+        btn.textContent = char + " に渡す";
+        btn.className = "choice";
+        btn.onclick = () => showEnding(char);
+        choices.appendChild(btn);
+      }
+
+      bgm.play().catch(err => console.log("BGM error:", err));
+    }
+
+    function showEnding(charName) {
+      document.getElementById("storyArea").style.display = "none";
+      document.getElementById("endingArea").style.display = "block";
+
+      document.getElementById("charImage").src = characters[charName].img;
+      document.getElementById("charImage").alt = charName;
+      document.getElementById("ending").textContent = characters[charName].ending;
     }
   </script>
 </body>
