@@ -1,99 +1,97 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>卒業ストーリー RPG風</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>卒業ストーリーRPG</title>
   <style>
     body {
-      background-color: #f9f5ec;
-      font-family: "MS Gothic", monospace;
       margin: 0;
-      padding: 0;
+      font-family: "MS PGothic", sans-serif;
+      background: linear-gradient(#ffe, #cdf);
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
+      justify-content: center;
       height: 100vh;
       overflow: hidden;
     }
-    #game {
-      background-color: #ffffff;
-      border: 4px solid #444;
+
+    .window {
+      background: white;
+      border: 2px solid black;
       border-radius: 10px;
       padding: 20px;
       width: 90%;
-      max-width: 600px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
-      position: relative;
+      max-width: 500px;
+      box-shadow: 4px 4px 0 black;
+      animation: fadeIn 1s ease-out;
     }
-    #dialogue {
-      min-height: 120px;
-      white-space: pre-wrap;
-      margin-bottom: 20px;
-      line-height: 1.5;
+
+    h1 {
+      text-align: center;
+      font-size: 1.8rem;
     }
-    .fade-in {
-      animation: fadeIn 1s ease-in-out;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
-    }
-    .choice {
+
+    input, button {
+      width: 100%;
       margin-top: 10px;
+      padding: 10px;
+      font-size: 1rem;
     }
-    button {
-      font-family: "MS Gothic", monospace;
-      background-color: #c8b6ff;
-      border: none;
-      padding: 10px 20px;
-      margin: 5px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.3s ease;
+
+    #story {
+      margin-top: 20px;
+      white-space: pre-line;
+      line-height: 1.5;
+      animation: fadeIn 1s ease-out;
     }
-    button:hover {
-      background-color: #b8a0ff;
-    }
-    #nameInput {
-      width: 80%;
-      padding: 8px;
-      font-size: 1em;
-      margin-bottom: 10px;
-    }
-    audio {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
-  <div id="game">
-    <div id="dialogue">
-      ようこそ。あなたの名前を入力してください。
-    </div>
+  <div class="window">
+    <h1>卒業ストーリー</h1>
     <div id="inputArea">
-      <input type="text" id="nameInput" placeholder="名前を入力">
-      <br>
-      <button onclick="startGame()">スタート</button>
+      <p>名前を入力してください：</p>
+      <input type="text" id="nameInput" placeholder="あなたの名前" />
+      <button onclick="startStory()">スタート</button>
     </div>
-    <div id="choices" style="display: none;"></div>
-    <audio id="bgm" src="https://cdn.pixabay.com/download/audio/2022/10/05/audio_d00576064a.mp3?filename=graduation-piano-122088.mp3" autoplay loop></audio>
+    <div id="storyArea" style="display: none;">
+      <div id="story"></div>
+    </div>
   </div>
 
-  <script>
-    let playerName = '';
-    const dialogue = document.getElementById('dialogue');
-    const inputArea = document.getElementById('inputArea');
-    const choices = document.getElementById('choices');
+  <audio id="bgm" loop>
+    <source src="https://cdn.pixabay.com/audio/2023/04/19/audio_812dde726d.mp3" type="audio/mpeg" />
+  </audio>
 
-    function typeText(text, callback) {
-      let i = 0;
-      dialogue.innerText = '';
-      const speed = 30;
-      const interval = setInterval(() => {
-        dialogue.innerText += text[i];
-        i++;
-        if (i >= text.length) {
-          clearInterval(inter
+  <script>
+    const bgm = document.getElementById("bgm");
+
+    function startStory() {
+      const name = document.getElementById("nameInput").value.trim();
+      if (!name) {
+        alert("名前を入力してください！");
+        return;
+      }
+
+      document.getElementById("inputArea").style.display = "none";
+      document.getElementById("storyArea").style.display = "block";
+
+      const story = `${name}は今日、卒業の日を迎えた。\n\n校舎の廊下には、たくさんの思い出が詰まっている。\n\n誰に最後の手紙を渡そうか…？\n\n１．親友に渡す\n２．ずっと好きだったあの人に渡す`;
+
+      document.getElementById("story").textContent = story;
+
+      // ユーザー操作後に再生：自動再生ブロック対策済み
+      bgm.play().catch(err => {
+        console.log("BGM再生できませんでした:", err);
+      });
+    }
+  </script>
+</body>
+</html>
