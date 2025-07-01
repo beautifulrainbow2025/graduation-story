@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>卒業ストーリーRPG風</title>
+  <title>卒業ストーリー RPG風</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
@@ -14,6 +14,7 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
+      overflow: hidden;
     }
     #game {
       background-color: #ffffff;
@@ -23,12 +24,20 @@
       width: 90%;
       max-width: 600px;
       box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      position: relative;
     }
     #dialogue {
       min-height: 120px;
       white-space: pre-wrap;
       margin-bottom: 20px;
       line-height: 1.5;
+    }
+    .fade-in {
+      animation: fadeIn 1s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
     }
     .choice {
       margin-top: 10px;
@@ -41,6 +50,7 @@
       margin: 5px;
       border-radius: 8px;
       cursor: pointer;
+      transition: background 0.3s ease;
     }
     button:hover {
       background-color: #b8a0ff;
@@ -50,6 +60,11 @@
       padding: 8px;
       font-size: 1em;
       margin-bottom: 10px;
+    }
+    audio {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
     }
   </style>
 </head>
@@ -64,6 +79,7 @@
       <button onclick="startGame()">スタート</button>
     </div>
     <div id="choices" style="display: none;"></div>
+    <audio id="bgm" src="https://cdn.pixabay.com/download/audio/2022/10/05/audio_d00576064a.mp3?filename=graduation-piano-122088.mp3" autoplay loop></audio>
   </div>
 
   <script>
@@ -72,48 +88,12 @@
     const inputArea = document.getElementById('inputArea');
     const choices = document.getElementById('choices');
 
-    function startGame() {
-      const input = document.getElementById('nameInput').value.trim();
-      if (!input) {
-        alert("名前を入力してください");
-        return;
-      }
-      playerName = input;
-      inputArea.style.display = "none";
-      showIntro();
-    }
-
-    function showIntro() {
-      dialogue.innerText =
-        `${playerName}は卒業式を終えた教室に一人立っている。\n` +
-        `夕陽が差し込み、思い出が胸をよぎる。\n\n` +
-        `今日、最後に手紙を渡す相手を決めなければならない...。`;
-
-      choices.innerHTML = `
-        <button onclick="choose('リン')">親友のリンに渡す</button>
-        <button onclick="choose('ミナト先生')">ミナト先生に渡す</button>
-      `;
-      choices.style.display = "block";
-    }
-
-    function choose(person) {
-      choices.style.display = "none";
-      if (person === 'リン') {
-        dialogue.innerText =
-          `${playerName}はリンのもとへ向かった。\n\n` +
-          `「リン、これ...手紙。3年間ありがとう」\n` +
-          `リンは驚いた顔をして、すぐに笑顔になった。\n\n` +
-          `「こっちこそ！最高の親友だよ！」\n\n` +
-          `涙があふれる卒業の夕暮れだった。`;
-      } else {
-        dialogue.innerText =
-          `${playerName}は職員室へと足を運ぶ。\n\n` +
-          `「先生、これ...受け取ってください」\n` +
-          `ミナト先生は少し目を見開き、手紙を大事そうに受け取った。\n\n` +
-          `「君の未来が光にあふれますように」\n\n` +
-          `静かな祝福に包まれた別れの時だった。`;
-      }
-    }
-  </script>
-</body>
-</html>
+    function typeText(text, callback) {
+      let i = 0;
+      dialogue.innerText = '';
+      const speed = 30;
+      const interval = setInterval(() => {
+        dialogue.innerText += text[i];
+        i++;
+        if (i >= text.length) {
+          clearInterval(inter
